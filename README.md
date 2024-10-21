@@ -344,3 +344,4 @@ This project is under the **MIT License**. See [LICENSE](LICENSE) for details.
 Embark on your automation journey with Kubiya! For questions or assistance, consult our [documentation](https://docs.kubiya.ai/) or reach out to our vibrant community.
 
 **Transform your workflows with Kubiya - Where automation meets innovation!**# Trigger workflow
+# New feature
