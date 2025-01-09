@@ -1,0 +1,42 @@
+name: Test Webhook Monitor
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-failures:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest boto3 flake8
+        
+    - name: Run problematic AWS tool
+      run: |
+        python -c "from aws.aws_tools.tools.s3_problematic import test_problematic_function; test_problematic_function()"
+      
+    - name: Force failure
+      run: exit 1
+      
+    - name: Send notification on failure
+      if: failure()
+      run: |
+        PAYLOAD=$(jq -n \
+                    --arg status "failure" \
+                    --arg repo "$GITHUB_REPOSITORY" \
+                    --arg workflow "$GITHUB_WORKFLOW" \
+                    --arg commit "$GITHUB_SHA" \
+                    '{status: $status, repository: $repo, workflow: $workflow, commit: $commit}')
+        curl -X POST -H "Content-Type: application/json" \
+        -d "$PAYLOAD" \
+        https://webhooksource-kubiya.hooks.kubiya.ai:8443/hv2Fq12EeVkXI73aedJAaKioO3W7gmfGwEu_M2Z4HvD1ILXZAHtcPPFXjKhBwFrDgO1NXO9of_vM2ytrqG3dxw==
